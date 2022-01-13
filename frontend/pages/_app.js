@@ -8,9 +8,10 @@ import { getStrapiMedia } from "../lib/media"
 // Store Strapi Global object in context
 export const GlobalContext = createContext({})
 
-const MyApp = ({ Component, pageProps }) => {
+const MyApp = ({ Component, pageProps, ...appProps }) => {
   const { global } = pageProps
-
+console.log({pageProps});
+console.log({appProps});
   return (
     <>
       <Head>
@@ -32,7 +33,9 @@ const MyApp = ({ Component, pageProps }) => {
 // https://github.com/vercel/next.js/discussions/10949
 MyApp.getInitialProps = async (ctx) => {
   // Calls page's `getInitialProps` and fills `appProps.pageProps`
+
   const appProps = await App.getInitialProps(ctx)
+  // appProps???????/
   // Fetch global site settings from Strapi
   const globalRes = await fetchAPI("/global", {
     populate: {

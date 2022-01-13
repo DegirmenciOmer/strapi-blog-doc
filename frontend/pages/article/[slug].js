@@ -1,4 +1,4 @@
-import ReactMarkdown from "react-markdown"
+// import ReactMarkdown from "react-markdown"
 import Moment from "react-moment"
 import { fetchAPI } from "../../lib/api"
 import Layout from "../../components/layout"
@@ -6,7 +6,9 @@ import NextImage from "../../components/image"
 import Seo from "../../components/seo"
 import { getStrapiMedia } from "../../lib/media"
 
-const Article = ({ article, categories }) => {
+const Article = (props) => {
+  const { article, categories, ...restprops }=props
+  console.log(article.attributes.author.data.attributes);
   const imageUrl = getStrapiMedia(article.attributes.image)
 
   const seo = {
@@ -15,6 +17,7 @@ const Article = ({ article, categories }) => {
     shareImage: article.attributes.image,
     article: true,
   }
+
 
   return (
     <Layout categories={categories.data}>
@@ -30,20 +33,23 @@ const Article = ({ article, categories }) => {
       </div>
       <div className="uk-section">
         <div className="uk-container uk-container-small">
-          <ReactMarkdown
+          {/* <ReactMarkdown
             source={article.attributes.content}
             escapeHtml={false}
-          />
+          /> */}
+<div>{article.attributes.content}</div>
+
           <hr className="uk-divider-small" />
           <div className="uk-grid-small uk-flex-left" data-uk-grid="true">
             <div>
               {article.attributes.author.picture && (
-                <NextImage image={article.attributes.author.picture} />
+                <NextImage image={article.attributes.author.data.attributes.picture} />
               )}
             </div>
             <div className="uk-width-expand">
               <p className="uk-margin-remove-bottom">
-                By {article.attributes.author.name}
+                By {article.attributes.author.data.attributes.name}
+                
               </p>
               <p className="uk-text-meta uk-margin-remove-top">
                 <Moment format="MMM Do YYYY">
@@ -75,6 +81,7 @@ export async function getStaticProps({ params }) {
   const articlesRes = await fetchAPI("/articles", {
     filters: {
       slug: params.slug,
+      
     },
     populate: "*",
   })
