@@ -10,8 +10,6 @@ export const GlobalContext = createContext({})
 
 const MyApp = ({ Component, pageProps, ...appProps }) => {
   const { global } = pageProps
-console.log({pageProps});
-console.log({appProps});
   return (
     <>
       <Head>

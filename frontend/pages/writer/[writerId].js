@@ -6,20 +6,19 @@ import NextImage from "../../components/image"
 import Seo from "../../components/seo"
 import { getStrapiMedia } from "../../lib/media"
 
-const Article = (props) => {
-  const { article, categories, ...restprops }=props
-  const imageUrl = getStrapiMedia(article.attributes.image)
+const Writer = ({writer, writers}) => {
+  const imageUrl = getStrapiMedia(writer.attributes.image)
 
   const seo = {
-    metaTitle: article.attributes.title,
-    metaDescription: article.attributes.description,
-    shareImage: article.attributes.image,
-    article: true,
+    metaTitle: writer.attributes.title,
+    metaDescription: writer.attributes.description,
+    shareImage: writer.attributes.image,
+    writer: true,
   }
 
 
   return (
-    <Layout categories={categories.data}>
+    <Layout writers={writers.data}>
       <Seo seo={seo} />
       <div
         id="banner"
@@ -28,31 +27,31 @@ const Article = (props) => {
         data-srcset={imageUrl}
         data-uk-img
       >
-        <h1>{article.attributes.title}</h1>
+        <h1>{writer.attributes.title}</h1>
       </div>
       <div className="uk-section">
         <div className="uk-container uk-container-small">
           {/* <ReactMarkdown
-            source={article.attributes.content}
+            source={writer.attributes.content}
             escapeHtml={false}
           /> */}
-<div>{article.attributes.content}</div>
+<div>{writer.attributes.content}</div>
 
           <hr className="uk-divider-small" />
           <div className="uk-grid-small uk-flex-left" data-uk-grid="true">
             <div>
-              {article.attributes.author.picture && (
-                <NextImage image={article.attributes.author.data.attributes.picture} />
+              {writer.attributes.author.picture && (
+                <NextImage image={writer.attributes.author.data.attributes.picture} />
               )}
             </div>
             <div className="uk-width-expand">
               <p className="uk-margin-remove-bottom">
-                By {article.attributes.author.data.attributes.name}
+                By {writer.attributes.author.data.attributes.name}
                 
               </p>
               <p className="uk-text-meta uk-margin-remove-top">
                 <Moment format="MMM Do YYYY">
-                  {article.attributes.published_at}
+                  {writer.attributes.published_at}
                 </Moment>
               </p>
             </div>
@@ -63,13 +62,15 @@ const Article = (props) => {
   )
 }
 
-export async function getStaticPaths() {
-  const articlesRes = await fetchAPI("/articles", { fields: ["slug"] })
+export async function getStaticPaths(props) {
+  const writersRes = await fetchAPI("/writers")
+
+  console.log({props, data: writersRes.data});
 
   return {
-    paths: articlesRes.data.map((article) => ({
+    paths: writersRes.data.map((writer) => ({
       params: {
-        slug: article.attributes.slug,
+        writerId: writer.id,
       },
     })),
     fallback: false,
@@ -77,19 +78,27 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const articlesRes = await fetchAPI("/articles", {
-    filters: {
-      slug: params.slug,
+  console.error(params)
+  const writersRes = await fetchAPI(`/writers/${params.writerId}?populate=picture`
+  , {
+    // filters: {
+    //   slug: params.slug,
       
-    },
-    populate: "*",
-  })
-  const categoriesRes = await fetchAPI("/categories")
+    // },
+    // populate: "*",
+  }
+  )
 
   return {
-    props: { article: articlesRes.data[0], categories: categoriesRes },
+    props: { writer: writersRes.data[0], writers: writersRes },
     revalidate: 1,
   }
 }
 
-export default Article
+
+
+
+
+
+
+export default Writer
